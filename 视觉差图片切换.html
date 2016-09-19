@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+*{margin:0;padding:0;}
+li{list-style:none;}
+body{background:#222;width:100%;height:100%;}
+.bg_one{width:100%;height:420px;background:url(img/bg1.png);position:relative;margin:100px auto 0;border-top:8px solid #333;border-bottom:8px solid #333;box-shadow:0 0 10px #000;}
+.bg_two{width:100%;height:420px;background:url(img/bg3.png),url(img/bg2.png);position:relative;}
+.content{width:760px;height:420px;position:relative;top:50px;left:50%;margin-left:-380px;}
+.main{width:760px;height:280px;overflow:hidden;border:8px solid transparent;position:relative;box-shadow:0 0 8px #333;border-radius:4px;}
+.big_img{width:5000px;height:280px;position:absolute;left:0;}
+.big_img li{float:left;}
+.small_img{position:relative;width:650px;margin:0 auto;}
+.small_img li{width:83px;height:55px;position:absolute;padding:5px;top:-10px;background:rgba(255,255,255,1);opacity:0.7;filter:alpha(opacity:70);cursor:pointer; }
+
+.main div{z-index:2;padding:18px 8px;position:absolute;border-radius:4px;background:rgba(0%,0%,0%,.5);top:50%;margin-top:-25px;cursor:pointer;}
+.prev{left:3px;}
+.next{right:3px;}
+.small_img li.selected{opacity:1;filter:alpha(opacity:100);}
+</style>
+<script src="js/completemove.js"></script>
+<script src="js/completegetClass.js"></script>
+<script>
+
+window.onload=function(){
+	var now=0;
+	var oBigImg=getClassOption('big_img')[0];
+	var aBigImg=oBigImg.getElementsByTagName('li');
+	var oBgOne=getClassOption('bg_one')[0];
+	var oBgTwo=getClassOption('bg_two')[0];
+	var oPrev=getClassOption('prev')[0];
+	var oNext=getClassOption('next')[0];
+	var arr=[20,-18,10,14,-20,19];
+	var aSmallImg=getClassOption('small_img')[0].getElementsByTagName('li');
+	oBigImg.style.width=aBigImg[0].offsetWidth*aBigImg.length+'px';
+	
+	//设置小图的位置和旋转的角度
+	for(var i=0;i<aSmallImg.length;i++){
+		aSmallImg[i].index=i;
+		aSmallImg[i].style.left=(aSmallImg[0].offsetWidth+20)*i+'px';
+		aSmallImg[i].style.transform='rotate('+arr[i]+'deg)';
+		//小图鼠标移入事件
+		
+		aSmallImg[i].onmouseover=function(){
+			startMove(this,{'top':-20});
+			};
+			//小图鼠标移出事件
+		aSmallImg[i].onmouseout=function(){
+			startMove(this,{'top':-10});
+			};
+			//小图点击事件
+		aSmallImg[i].onclick=function(){
+			
+			now=this.index;
+			
+			
+			
+			tab(now);
+			};
+	}
+	//左右按钮的鼠标移入的事件
+	oPrev.onmouseover=oNext.onmouseover=function(){
+		this.style.background='#000';
+		};
+	oPrev.onmouseout=oNext.onmouseout=function(){
+		this.style.background='rgba(0,0,0,0.5)';
+		};
+		//←鼠标点击
+	oPrev.onclick=function(){
+		now--;
+		if(now==-1){
+			now=aBigImg.length-1;
+		}
+		tab();
+		};
+	//→鼠标点击
+	oNext.onclick=function(){
+		now++;
+		
+		if(now==aBigImg.length){
+			
+			now=0;
+			
+		}
+		tab();
+
+		};
+	
+	function tab(direction){
+		for(var i=0;i<aSmallImg.length;i++){
+				aSmallImg[i].style.opacity=0.7;
+				aSmallImg[now].style.filter='alpha(opacity:70)';
+			}
+		aSmallImg[now].style.opacity=1;
+		aSmallImg[now].style.filter='alpha(opacity:100)';
+		startMove(oBigImg,{'left':-now*aBigImg[0].offsetWidth});
+		startMove(oBgOne,{'backgroundPosition':((-now*aBigImg[0].offsetWidth))/5});
+		startMove(oBgTwo,{'backgroundPosition':((-now*aBigImg[0].offsetWidth))/2});
+		}
+	
+	}
+	
+	
+	
+</script>
+</head>
+
+<body>
+<div id="container">
+   <div class="bg_one">
+       <div class="bg_two">
+       <div class="content">
+           <div class="main">
+           <div class="prev"><img src="img/prev.png" /></div>
+           <ul class="big_img">
+              <li><img src="img/1.jpg" /></li>
+              <li><img src="img/2.jpg" /></li>
+              <li><img src="img/3.jpg" /></li>
+              <li><img src="img/4.jpg" /></li>
+              <li><img src="img/5.jpg" /></li>
+              <li><img src="img/6.jpg" /></li>
+           </ul>
+           <div class="next"><img src="img/next.png" /></div>
+           
+           </div>
+            <ul class="small_img">
+               <li class="selected"><img width="83" height="55" src="img/thumbs/1.jpg" /></li>
+               <li><img width="83" height="55" src="img/thumbs/2.jpg" /></li>
+               <li><img width="83" height="55" src="img/thumbs/3.jpg" /></li>
+               <li><img width="83" height="55" src="img/thumbs/4.jpg" /></li>
+               <li><img width="83" height="55" src="img/thumbs/5.jpg" /></li>
+               <li><img width="83" height="55" src="img/thumbs/6.jpg" /></li>
+           </ul>
+           </div>
+       </div>
+   </div>
+</div>
+</body>
+</html>

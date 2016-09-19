@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+*{margin:0;padding:0;}
+li{list-style:none;}
+#container{width:400px;height:435px;margin:50px auto;background:#666;position:relative;overflow:hidden;}
+.big_img{width:400px;height:320px;position:absolute;border-bottom:1px soli #999;}
+/*对Li设置overflow，溢出则隐藏，这样li的高度变化图片才会随之显示或隐藏*/
+.big_img li{position:absolute;top:0;left:0;width:400px;height:320px;overflow: hidden; }
+.mark_left{width:200px;height:320px;position:absolute;top:0;left:0;z-index:3000;cursor:pointer;}
+.mark_right{width:200px;height:320px;position:absolute;top:0;right:0;z-index:3000;cursor:pointer;}
+.prev{width:60px;height:60px;background:url(img/btn.gif) no-repeat top left;position:absolute;top:50%;margin-top:-30px;
+left:5px;z-index:3001;opacity:0;filter:alpha(opacity:0);cursor:pointer;}
+.next{width:60px;height:60px;background:url(img/btn.gif) no-repeat bottom left;position:absolute;top:50%;margin-top:-30px;
+right:5px;z-index:3001;opacity:0;filter:alpha(opacity:0);cursor:pointer;}
+.bg{width:400px;height:30px;background:#000;opacity:0.7;filter:alpha(opacity:70);position:absolute;bottom:0;left:0;z-index:2998;}
+.text,.number{height:30px;line-height:30px;font-size:12px;color:#CCC;position:absolute;bottom:0;margin-left:5px;z-index:2999;}
+.big_img .number{right:0;margin-right:5px;}
+.small_img{position:absolute;height:94px;bottom:0;left:0;}
+.small_img li{float:left;width:120px;height:94px;margin-left:10px;margin-top:-10px;cursor:pointer;opacity:0.5;filter:alpha(opacity:50);}
+.small_img li img{width:120px;height:94px;}
+.small_img li.selected{opacity:1;filter:alpha(opacity:100);}
+</style>
+<script src="js/completegetClass.js"></script>
+<script src="js/completemove.js"></script>
+<script>
+window.onload=function(){
+	var oContainer=document.getElementById('container');
+	var oBigImg=getClassOption('big_img')[0];
+	var aBigImg=oBigImg.getElementsByTagName('li');
+	var oMarkL=getClassOption('mark_left')[0];
+	var oMarkR=getClassOption('mark_right')[0];
+	var oPrev=getClassOption('prev')[0];
+	var oNext=getClassOption('next')[0];
+    var oTxt=getClassOption('text')[0];
+	var oNum=getClassOption('number')[0];
+	var oSmallImg=getClassOption('small_img')[0];
+	var now=0;
+	var zIndex=2;
+	var arr=['都市魅力','古色古香','沉浸舞步的舞者','名贵跑车','聆听天籁的精灵','绚彩光芒'];
+	var aSmallImg=oSmallImg.getElementsByTagName('li');
+	oSmallImg.style.width=(aSmallImg[0].offsetWidth+10)*aSmallImg.length+'px';
+	//进入左边区域或者进入左按钮就显示左按钮，出去则隐藏，右边同理
+	oMarkL.onmouseover=oPrev.onmouseover=function(){
+		startMove(oPrev,{'opacity':100});	
+	};
+	oMarkL.onmouseout=oPrev.onmouseout=function(){
+		startMove(oPrev,{'opacity':0});	
+	};
+	oMarkR.onmouseover=oNext.onmouseover=function(){
+		startMove(oNext,{'opacity':100});	
+	};
+	oMarkR.onmouseout=oNext.onmouseout=function(){
+		startMove(oNext,{'opacity':0});	
+	};
+	//小图点击事件
+	for(var i=0;i<aSmallImg.length;i++){
+		aSmallImg[i].index=i;
+		aSmallImg[i].onclick=function(){
+			//若当前图片就是被点击的图片，则下面代码直接不执行
+			if(now==this.index){return;}
+			now=this.index;
+			tab();
+		};
+		//鼠标移入，类名改变，移出，判断这个li是不是当前图片对应的li，若不是则清空类名
+		aSmallImg[i].onmouseover=function(){
+			this.className='selected';
+		};
+		aSmallImg[i].onmouseout=function(){
+			if(this.index!=now){
+			this.className='';
+			}
+		};
+	}
+    //prev事件
+	oPrev.onclick=function(){
+		
+		now--;
+		if(now<0){
+			now=aBigImg.length-1;
+		}
+		tab();
+	    
+	};
+	//next事件
+	oNext.onclick=function(){
+		
+		now++;
+		if(now>=aBigImg.length){
+			now=0;
+		}
+		tab();
+	    
+	};
+	//切换效果
+	function tab(){
+		//设置层级，层级随着tab被执行一次就+1（使当前图片的层级高于其他图片）,先将当前的高度设为0，再设置当前图片的高度为图片的高度
+	   aBigImg[now].style.zIndex=zIndex++;
+	   aBigImg[now].style.height=0;
+	   startMove(aBigImg[now],{'height':320});
+	   
+	   for(var i=0;i<aSmallImg.length;i++){
+		   aSmallImg[i].className='';
+	   }
+	   aSmallImg[now].className='selected';
+	   //若当前图片为最后一张，则位置就不再需要改变，ul的left设为和之前一样
+	   if(now==aBigImg.length-1){
+	   startMove(oSmallImg,{'left':-(now-2)*(aSmallImg[0].offsetWidth+10)});
+	   }else if(now==0){//若当前图片为第一张，则left仍为0
+		startMove(oSmallImg,{'left':0});
+	   }else{//因为若当前图片是第二张图片，则ul的位置还是不变，之后每次向左移动(aSmallImg[0].offsetWidth+10)，所以是now-1
+		 startMove(oSmallImg,{'left':-(now-1)*(aSmallImg[0].offsetWidth+10)});  
+	   }
+	   oText.innerHTML=arr[now];
+	   oNum.innerHTML=(now+1)+'/'+arr.length;
+
+	}
+	var timer=null;
+	timer=setInterval(oNext.onclick,3000);
+	oContainer.onmouseover=function(){
+		clearInterval(timer);
+	};
+	oContainer.onmouseout=function(){
+		timer=setInterval(oNext.onclick,3000);
+	};
+	}
+</script>
+</head>
+
+<body>
+<div id="container">
+  <div class="big_img">
+        <ul>
+            <li style="z-index:1;"><img src="img/f1.jpg" /></li>
+            <li><img src="img/f2.jpg" /></li>
+            <li><img src="img/f3.jpg" /></li>
+            <li><img src="img/f4.jpg" /></li>
+            <li><img src="img/f5.jpg" /></li>
+            <li><img src="img/f6.jpg" /></li>
+        </ul>
+        <div class="mark_left"></div>
+        <div class="mark_right"></div>
+        <div class="prev"></div>
+        <div class="next"></div>
+    <div class="bg"></div>
+      <span class="text">都市魅力</span>
+      <span class="number">1/6</span>
+    </div>
+    <ul class="small_img">
+        <li  class="selected"><img src="img/f1.jpg" /></li>
+        <li><img src="img/f2.jpg" /></li>
+        <li><img src="img/f3.jpg" /></li>
+        <li><img src="img/f4.jpg" /></li>
+        <li><img src="img/f5.jpg" /></li>
+        <li><img src="img/f6.jpg" /></li>
+    </ul>
+</div>
+</body>
+</html>

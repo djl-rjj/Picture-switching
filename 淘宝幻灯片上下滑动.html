@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+*{margin:0;padding:0;}
+li{list-style:none;}
+#container{width:100%;height:100%;}
+#wrapper{width:750px;height:360px;position:relative;margin:50px auto;overflow:hidden;}
+#img{position:absolute;top:0;left:0;}
+#img li{width:760px;height:360px;}
+#nav{position:absolute;bottom:5px;right:5px;}
+#nav li{float:left;border:1px solid #F30;width:20px;height:20px;color:#F30;padding:4px;background:#fff;text-align:center;margin-left:3px;cursor:pointer;}
+#nav li.selected{background:#F30;color:#fff;border:1px solid #FF6820;}
+</style>
+<script src="js/completemove.js"></script>
+<script>
+window.onload=function(){
+	var oImg=document.getElementById('img');
+	var aImg=oImg.getElementsByTagName('img');
+	var oNav=document.getElementById('nav');
+	var  aLi=oNav.getElementsByTagName('li');
+	var oWrapper=document.getElementById('wrapper');
+	var timer=null;
+	var now=0;
+	for(var i=0;i<aLi.length;i++){
+		aLi[i].index=i;
+		aLi[i].onclick=function(){
+			for(var i=0;i<aLi.length;i++){
+				aLi[i].className='';
+			}
+			now=this.index;
+			this.className='selected';
+			startMove(oImg,{top:-now*aImg[0].offsetHeight});
+			
+		};
+	}
+	timer=setInterval(tab,3000);
+	 
+	 oWrapper.onmouseover=function(){
+		 clearInterval(timer);
+		 };
+	 oWrapper.onmouseout=function(){
+		timer=setInterval(tab,3000);
+		 };
+		 //切换效果
+	function tab(){
+			now++;
+		    if(now>=aImg.length){
+			    now=0;
+		    }
+		    for(var i=0;i<aLi.length;i++){
+				aLi[i].className='';
+		    }
+		    aLi[now].className='selected';
+		    startMove(oImg,{top:-(now)*aImg[0].offsetHeight});
+		 }
+	}
+</script>
+</head>
+
+<body>
+<div id="container">
+    <div id="wrapper">
+         <ul id="img">
+            <li><img src="img/tb_1.jpg"</li>
+            <li><img src="img/tb_2.jpg"</li>
+            <li><img src="img/tb_3.jpg"</li>
+            <li><img src="img/tb_4.jpg"</li>
+            <li><img src="img/tb_5.jpg"</li>
+         </ul>
+         <ul id="nav">
+            <li class="selected">1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+         </ul>
+    </div>
+</div>
+</body>
+</html>

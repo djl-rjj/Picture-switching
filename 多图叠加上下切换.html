@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+*{
+	margin:0;
+	padding:0;
+}
+body{
+    position:absolute;
+	width:100%;
+	height:100%;
+	overflow:hidden;
+	background:#C9F;
+	}
+	
+li{
+	position:absolute;top:0;left:0;
+	list-style:none;
+	}
+input{
+	position:absolute;
+	top:200px;
+    }
+input:nth-of-type(1){
+	left:-50px;
+	}
+input:nth-of-type(2){
+    left:50px;
+	}
+</style>
+<script src="js/completemove.js"></script>
+<script>
+window.onload=function(){
+	
+	
+	var aLi=document.getElementsByTagName('li');
+	var l=aLi.length;
+	var aBtn=document.getElementsByTagName('input');
+    //当前为第几张图(不是按真实显示来看，而是按元素添加顺序)，由于层级的关系，最后一张图片会被放在最上面，所以当前为最后一张图片
+	var now=l-1;
+	//上一张的层级标志
+	var nowZinex=2;
+	//下一张的层级标志
+	var nowZinex2=-1;
+	//上一张按钮	
+	aBtn[0].onclick=function(){
+		//若now不为最后一张图，比如now是第二张图，则点击上一张按钮，则将当前图片切换为第三张图（aLi[1],aLi[0],aLi[4],aLi[3],aLi[2],比如这个时候
+		//aLi[1]是当前图片，所以要将aLi[2]的层级设置为最高，设置为当前图片）
+		//但若now为最后一张图，如（aLi[3],aLi[2],aLi[1],aLi[0],则要将aLi[0]的层级设为最高，并且设为当前图片）
+	    now++;
+		if(now==l){
+			now=0;
+		}
+		tab();
+		};
+	aBtn[1].onclick=function(){
+		//若now为第一张图，也就是aLi[0],则下一张为最后一张图，所以要将now设为最后一张图，由于函数在之前就now--了，所以讲now设为倒数第二张，在下面的
+		//方法中，最后一张的层级会设置为最小
+		//但若now不为第一张图，则会直接将now--后的前一张图的层级设置为最小
+	    now--;
+		if(now==-2){
+			now=l-2;
+		}
+		tab2();
+		};
+		function tab(){
+			startMove(aLi[now],{'top':408},function(){
+				aLi[now].style.zIndex=nowZinex++;
+				startMove(aLi[now],{'top':0});
+				})
+				
+			}
+		function tab2(){
+			startMove(aLi[(now+1)],{'top':-408},function(){
+				aLi[(now+1)].style.zIndex=nowZinex2--;
+				startMove(aLi[(now+1)],{'top':0});
+				})
+				
+			}
+		
+	}
+
+</script>
+</head>
+
+<body>
+
+<div style="width:460px;height:200px;position:relative;top:50%;left:50%;">
+<ul id="ul1" style="width:460px;height:408px;position:absolute;top:-204px;left:-230px;">
+    <li><img src="img/picture1.png"/></li>
+    <li><img src="img/picture2.png"/></li>
+    <li><img src="img/picture3.png"/></li>
+    <li><img src="img/picture4.png"/></li>
+    <li><img src="img/picture5.png"/></li>  
+   
+</ul>
+<input type="button" value="上一张" />
+<input type="button" value="下一张" />
+</div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+*{
+	margin:0;
+	padding:0;
+}
+body{
+    position:absolute;
+	width:100%;
+	height:100%;
+	overflow:hidden;
+	background:#C9F;
+	}
+	
+li{
+	position:absolute;top:0;left:0;
+	list-style:none;
+	}
+input{
+	position:absolute;
+	top:200px;
+    }
+input:nth-of-type(1){
+	left:-50px;
+	}
+input:nth-of-type(2){
+    left:50px;
+	}
+</style>
+<script src="js/jquery-1.8.3.min.js"></script>
+<script>
+$(document).ready(function(e) {
+    var z=0;
+	//遍历图片，为每张图片都赋上一个层级
+	$('#ul1 li').each(function() {
+        z++;
+		$(this).css('z-index',z);
+    });
+	//标志当前是否有动画在执行
+    var isAnimated=false;
+	//isFirst,是否是层级最高的那张图片
+	function tabImage(isFirst){
+		//若正有动画在执行，则不再执行下面代码，否则就将标志设为否
+		
+		if(isAnimated){
+			return;
+		}else{
+			isAnimated=false;
+			}
+			
+		//目标层级
+		var prozIndex;
+		//目标层级所在的图片要新设置的层级
+		var newzIndex;
+		//其他图片要增减的层级数
+		var up_down;
+		//图片移动的方向
+		var decoration;
+        //若是最上面的那张图
+		if(isFirst){
+			prozIndex=z;
+			newzIndex=1;
+			up_down=1;
+			decoration=-1;
+			}else{
+			prozIndex=1;
+			newzIndex=z;
+			up_down=-1;
+			decoration=1;
+				}
+				
+		//遍历图片，如果要处理的图片是层级最高的图片，则将这张图片的层级设为1，其他的图片在原来的层级上加1
+		//如果要处理的图片是层级最低的图片，则将这张图片的层级设为最高层级，其他的图片在原来的层级上减一
+		//若要对图片设置层级，则要对图片设置绝对定位，而不是Li
+		$('#ul1 li').each(function() {
+            if($(this).css('z-index')==prozIndex){
+				
+				$(this).animate({'top':decoration*$(this).height()+'px'},'slow',function(){
+					$(this).css('z-index',newzIndex).animate({'top':0},'slow',function(){
+						//动画执行完毕后，将标志设为false;
+						isAnimated=false;
+						});
+					});
+			}else{
+			    $(this).css('z-index',parseInt($(this).css('z-index'))+up_down);
+			}
+        });	
+		
+		}
+		
+		$('input:eq(0)').click(function(){
+			tabImage(false);
+			});
+		$('input:eq(1)').click(function(){
+			tabImage(true);
+			});
+});
+</script>
+</head>
+
+<body>
+
+<div style="width:460px;height:200px;position:relative;top:50%;left:50%;">
+<ul id="ul1" style="width:460px;height:408px;position:absolute;top:-204px;left:-230px;">
+    <li><img src="img/picture1.png"/></li>
+    <li><img src="img/picture2.png"/></li>
+    <li><img src="img/picture3.png"/></li>
+    <li><img src="img/picture4.png"/></li>
+    <li><img src="img/picture5.png"/></li>  
+   
+</ul>
+<input type="button" value="上一张" />
+<input type="button" value="下一张" />
+</div>
+</body>
+</html>

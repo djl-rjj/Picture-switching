@@ -1,0 +1,294 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+*{margin:0;padding:0;}
+body{background:#222;}
+li{list-style:none;}
+#container{width:100%;height:420px;margin:100px auto 0;position:relative;border-top:7px solid #333;border-bottom:7px solid #333;overflow:hidden;-moz-box-shadow:0px 0px 7px #000;-webkit-box-shadow:0px 0px 7px #000;box-shadow:0px 0px 7px #000;}
+.pxs_bg{height:420px;background:transparent url(img/bg.png) repeat top left;}
+.pxs_bg div{position:absolute;top:0px;left:0px;width:7584px;height:420px;background-repeat:repeat;background-position:top left;background-color:transparent;}
+.bg1{background:url(img/bg1.png);}
+.bg2{background:url(img/bg2.png);}
+.bg3{background:url(img/bg3.png);}
+.pxs_wrapper{display:none;}
+.pxs_slider{height:420px;position:absolute;top:0;left:0;}
+.pxs_slider li{float:left;position:relative;height:420px;}
+.pxs_slider li img{display:block;margin:35px auto 0px auto;-moz-box-shadow:0px 0px 7px #222;-webkit-box-shadow:0px 0px 7px #222;box-shadow:0px 0px 7px #222;border: 8px solid transparent;-moz-border-radius:4px;-webkit-border-radius:4px;border-radius:4px;}
+ul.thumbs_wrapper{height:35px;position:absolute;top:320px;left:50%;}
+ul.thumbs_wrapper li{position:absolute;display:block;}
+ul.thumbs_wrapper li img{border: 5px solid #FFFFFF;-moz-box-shadow:1px 1px 7px #555;-webkit-box-shadow:1px 1px 7px #555;box-shadow:1px 1px 7px #555;cursor:pointer;display:block;opacity:0.7;}
+ul.thumbs_wrapper li.selected img{opacity:1.0;}
+.pxs_nav div{position:absolute;width:30px;height:60px;-moz-box-shadow:0px 0px 2px #000;-webkit-box-shadow:0px 0px 2px #000;box-shadow:0px 0px 2px #000;top:145px;opacity:0.6;-moz-border-radius:4px;-webkit-border-radius:4px;border-radius:4px;cursor:pointer;}
+.pxs_nav div:hover{opacity:0.9;}
+.pxs_nav div.prev{background:#000 url(../images/prev.png) no-repeat center center;}
+.pxs_nav div.next{background:#000 url(img/next.png) no-repeat center center;}
+.pxs_loading{color:#fff;font-size:20px;padding:15px 15px 15px 50px;background:#333 url(img/ajax-loader.gif) no-repeat 10px 50%;-moz-border-radius:15px;-webkit-border-radius:15px;border-radius:15px;opacity:0.7;width:180px;position:absolute;top:150px;left:50%;margin-left:-90px;}
+</style>
+</head>
+
+<body>
+<div id="container">
+    <div class="pxs_bg">
+        <div class="bg1"></div>
+        <div class="bg2"></div>
+        <div class="bg3"></div>
+    </div>
+    <div class="pxs_loading">Loading images...</div>
+    <div class="pxs_wrapper">
+        <ul class="pxs_slider">
+           <li><img src="img/1.jpg" /></li>
+           <li><img src="img/2.jpg" /></li>
+           <li><img src="img/3.jpg" /></li>
+           <li><img src="img/4.jpg" /></li>
+           <li><img src="img/5.jpg" /></li>
+           <li><img src="img/6.jpg" /></li>
+        </ul>
+    
+        <div class="pxs_nav">
+            <div class="prev"></div>
+            <div class="next"></div>
+        </div>
+        <ul class="thumbs_wrapper">
+           <li><img src="img/thumbs/1.jpg"</li>
+           <li><img src="img/thumbs/2.jpg"</li>
+           <li><img src="img/thumbs/3.jpg"</li>
+           <li><img src="img/thumbs/4.jpg"</li>
+           <li><img src="img/thumbs/5.jpg"</li>
+           <li><img src="img/thumbs/6.jpg"</li>
+        </ul>
+    </div>
+</div>
+<script src="js/jquery-1.8.3.min.js"></script>
+<script src="js/jquery.easing.1.3.js"></script>
+<script>
+      (function($){
+		  //为jquery实例对象添加parallaxSlider方法
+		  $.fn.parallaxSlider=function(options){
+			  //合并默认配置参数和自定义参数
+			  var ops=$.extend({},$.fn.parallaxSlider.defaults,options); 
+			  //返回内部的所有参数
+			  return this.each(function(){
+				  var $pxs_container=$(this),
+				  o=$.meta?$.extend({}, ops, $pxs_container.data()):ops,
+				  $pxs_wrapper=$('.pxs_wrapper'),
+				  $pxs_slider=$('.pxs_slider'),
+				  $elems=$pxs_slider.children(),
+				  total_elems=$elems.length,
+				  $pxs_nav=$('.pxs_nav'),
+		          $pxs_prev=$('.prev'),
+				  $pxs_next=$('.next'),
+				  $pxs_bg1=$('.bg1'),
+				  $pxs_bg2=$('.bg2'),
+				  $pxs_bg3=$('.bg3'),
+				  $pxs_loading=$('.pxs_loading');
+				  $pxs_thumb=$('.thumbs_wrapper'),
+				  $thumbs=$pxs_thumb.children(),
+				  slideshow=null,
+				  current=0,
+				  $image=$pxs_wrapper.find('img');
+				  var loaded=0;
+				  //遍历所有图片
+				  $image.each(function(){
+					  var $img=$(this);
+					 
+					  //当图片加载时，loaded+1，当loaded变成全部图片的数量时，说明图片加载完成了，就将Loading图片隐藏，显示内容
+					  $('<img/>').load(function() {
+                        loaded++;
+						if(loaded==total_elems*2){
+							$pxs_loading.hide();
+							$pxs_wrapper.show();
+							
+							     //加载完后对所有事件以及元素初始化
+								 //一张大图的宽度
+								 var one_img_w=$pxs_slider.find('img:first').width();
+								 //设置宽度
+								 setWidth($pxs_slider,$elems,total_elems,$pxs_bg1,$pxs_bg2,$pxs_bg3,one_img_w,$pxs_next,$pxs_prev);                       
+								 //设置小图容器的位置
+								 $pxs_thumb.css({
+										'width'			: one_img_w + 'px',
+										'margin-left' 	: -one_img_w/2 + 'px'
+								});
+								
+								 $thumbs.each(function(i){
+									 var $this=$(this)
+									 //设置小图间的间隔,间隔为一张大图的宽度-所有小图的宽度然后除以小图的数量
+								    var space=parseInt((one_img_w-($this.width()*total_elems))/(total_elems+1));
+									var l=space*(i+1)+i*$this.width();
+									//设置随机角度
+									var randomDeg=parseInt(Math.random()*41-20);
+									$this.css('left',l+'px');
+									//若参数旋转配置为true则执行旋转
+									if(o.thumbRotation){
+										$this.css({
+										'transform'        : 'rotate('+ randomDeg +'deg)',
+										'webkit-transform' : 'rotate('+ randomDeg +'deg)',
+										'moz-transform'    : 'rotate('+ randomDeg +'deg)'
+										})
+										}
+									//mouseenter和mouseleave不会触发冒泡
+									//为小图绑定鼠标进入和出来的事件
+									$this.bind('mouseenter',function(){
+											$(this).stop().animate({top:'-10px'},100);
+										}).bind('mouseleave',function(){
+											$(this).stop().animate({top:'0px'},100);
+									});
+									
+									
+								 });
+						    //设置默认选中的小图
+							selectedThumbs($thumbs.eq(0));
+								 
+						    //为下一张按钮绑定点击事件
+				            $pxs_next.bind('click',function(){
+					             current++;
+					             //若当前图片的上一张已经是最后一张，并且配置了可循环，则将当前图片设置为第一张图片;                                 //若不可循环则current回到先前的数
+					             if(current>=total_elems){
+						              if(o.circular){
+							              current=0;
+						              }else{
+							              current--;
+							              return false;	  
+						              }
+					             }
+								 
+								slide(current,$pxs_slider,$pxs_bg1,$pxs_bg2,$pxs_bg3,o.speed,o.easing,o.easingBg);
+								selectedThumbs($thumbs.eq(current));
+				            });
+							//为上一张按钮绑定点击事件
+							 $pxs_prev.bind('click',function(){
+					             current--;
+					             //若当前图片的上一张已经是最后一张，并且配置了可循环，则将当前图片设置为第一张图片;                                 //若不可循环则current回到先前的数
+					             if(current<0){
+						              if(o.circular){
+							              current=total_elems-1;
+						              }else{
+							              current++;
+							              return false;	  
+						              }
+					             }
+								 
+								slide(current,$pxs_slider,$pxs_bg1,$pxs_bg2,$pxs_bg3,o.speed,o.easing,o.easingBg);
+								selectedThumbs($thumbs.eq(current));
+				            });
+							
+							//为小图绑定点击事件
+							$thumbs.bind('click',function(){
+								var $thumb=$(this);
+								selectedThumbs($thumb);
+								//若参数自动播放事件间隔存在，则要关闭定时器
+								if(o.auto){
+									clearInterval(slideshow);
+								}
+								current=$thumb.index();
+								slide(current,$pxs_slider,$pxs_bg1,$pxs_bg2,$pxs_bg3,o.speed,o.easing,o.easingBg);
+			
+								});
+							//如果参数自动播放间隔时间不为0，就开一个定时器，此时将参数设置为可循环
+							if(o.auto != 0){
+										o.circular	= true;
+										slideshow	= setInterval(function(){
+											$pxs_next.trigger('click');
+										},o.auto);
+									}
+							 /*
+		                     (在图片加载成功以后才执行）当窗口大小改变的时候，自动改变宽度及执行slide事件
+		                     */
+		                     $(window).resize(function(e) {
+		                         setWidth($pxs_slider,$elems,total_elems,$pxs_bg1,$pxs_bg2,$pxs_bg3,one_img_w,$pxs_next,$pxs_prev);
+				
+          });
+						}
+                    }).error(function(){//若图片加载错误，则执行
+								alert('here')
+							}).attr('src',$img.attr('src'));
+					 
+				  });
+				  
+				  
+				  });
+			  }
+			  
+			  
+			  
+			  
+		   //获取到可见区域的宽度
+		   var pageWidth=$(window).width();
+		 
+		   /*
+		   设置滑动层，滑动层下的li，背景图的宽度以及导航的位置
+		   $pxs_slider:滑动层
+		   $elems:大图
+		   $pxs_bg1，$pxs_bg2，$pxs_bg3背景图
+		   one_image_w：一张大图的宽度
+		   $pxs_next,$pxs_prev:左右按钮
+		   */
+		   var setWidth=function($pxs_slider,
+				$elems,
+				total_elems,
+				$pxs_bg1,
+				$pxs_bg2,
+				$pxs_bg3,
+				one_image_w,
+				$pxs_next,
+				$pxs_prev){
+					var $pxs_slider_w=total_elems*pageWidth;
+					$pxs_slider.width($pxs_slider_w+'px');
+					$elems.width(pageWidth+'px');
+					$pxs_bg1.width($pxs_slider_w+'px');
+					$pxs_bg2.width($pxs_slider_w+'px');
+					$pxs_bg3.width($pxs_slider_w+'px');
+					var nav_pos=(pageWidth/2)-(one_image_w/2)+3;
+					$pxs_prev.css('left',nav_pos+'px');
+					$pxs_next.css('right',nav_pos+'px');
+					};
+		  /*
+		  滑动样式
+		  speed:动画执行速度
+		  easing:滑动层动画运动效果
+		  easingBg:背景层动画运动效果
+		  */
+		  var slide=function(current,$pxs_slider,
+				$pxs_bg1,
+				$pxs_bg2,
+				$pxs_bg3,
+				speed,
+				easing,
+				easingBg){
+				//移动的距离
+			    var slide_to= parseInt(-pageWidth * current);
+				//移动滑动层
+				$pxs_slider.stop().animate({left:slide_to+'px'},speed,easing);
+				//移动背景层
+				$pxs_bg1.stop().animate({left:slide_to/8+'px'},speed,easingBg);
+				$pxs_bg2.stop().animate({left:slide_to/4+'px'},speed,easingBg);
+				$pxs_bg3.stop().animate({left:slide_to/2+'px'},speed,easingBg);
+		  }
+		  //改变选中的小图的样式
+		  var selectedThumbs=function($elem){
+			    //将此元素的兄弟姐妹元素移除selected类，为此元素增加selected元素
+			    $elem.siblings().removeClass('selected');
+				$elem.addClass('selected');
+		  };
+		  // $.fn.parallaxSlider的默认配置
+		  $.fn.parallaxSlider.defaults={
+			  auto          : 0,       //自动播放的间隔时间
+			  speed         : 1000,    //运行动画的时间
+			  easing        : 'jswing',//滑动层的运动效果
+			  easingBg      : 'jswing',//背景层的运动效果
+			  circular      : true,    //是否要循环
+			  thumbRotation : true    //是否要旋转
+			  };
+			 
+		  })(jQuery);
+</script>
+<script>
+            $(function() {
+				var $pxs_container	= $('#container');
+				$pxs_container.parallaxSlider();
+			});
+</script>
+</body>
+</html>
