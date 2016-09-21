@@ -7,7 +7,7 @@
 *{margin:0;padding:0;}
 li{list-style:none;}
 #wrapper{width:400px;height:435px;margin:50px auto;background:#666;position:relative;overflow:hidden;}
-#container{position:relative;width:400px;height:435px;}
+#container{position:relative;width:400px;height:435px;display:none;}
 .big_img{width:400px;height:320px;position:absolute;border-bottom:1px solid #999;}
 /*对Li设置overflow，溢出则隐藏，这样li的高度变化图片才会随之显示或隐藏*/
 .big_img li{position:absolute;top:0;left:0;width:400px;height:320px;overflow: hidden; }
@@ -87,82 +87,104 @@ right:5px;z-index:3001;opacity:0;filter:alpha(opacity:0);cursor:pointer;}
 				 arr=['都市魅力','古色古香','沉浸舞步的舞者','名贵跑车','聆听天籁的精灵','绚彩光芒'];
 				 total_imgs=$asmallImg.length;
 				 var loaded=0;
-				 //为多个元素绑定同一个事件
-				 $('.prev,.mark_left').bind(
-				 {'mouseenter':function(){
-						$prev.stop().animate({opacity:100},1000);
-				 },
-				 'mouseleave':function(){
-						$prev.stop().animate({opacity:0},1000);
-					}
-				 });
-				 $('.next,.mark_right').bind(
-				 {'mouseenter':function(){
-						$next.stop().animate({opacity:100},1000);
-				 },
-				 'mouseleave':function(){
-						$next.stop().animate({opacity:0},1000);
-					}
-				 });
-				 //遍历小图
-				 $asmallImg.each(function(){
-					 var $sm=$(this);
-					 $sm.click(function(){
-						if(o.auto){
-							clearInterval(tabShow);
-						}
-					 if(now==$sm.index()){return;}
-					 now=$sm.index();
-					 tab(now,$abigImg.eq(now),$smallImg,$asmallImg,zIndex,o.speed,o.easing,total_imgs,$text,$num,arr[now]);
-					 zIndex++;
-					 });
-					 $sm.bind('mouseenter',function(){
-						 $(this).addClass('selected');
-					 });
-					 $sm.bind('mouseleave',function(){
-						 if($(this).index()!=now){
-							$(this).removeClass('selected');
-						 }
-					  });
-				});
+				 $image.each(function(){
+					  var $img=$(this);
+					  loaded++;
+					  if(loaded==total_imgs*2){
+						   $loading.hide();
+						   $container.show();	  
+				           //为多个元素绑定同一个事件
+				           $('.prev , .mark_left').bind(
+				                {'mouseenter':function(){
+						           $prev.stop().animate({opacity:100},1000);
+				                },
+				                'mouseleave':function(){
+						           $prev.stop().animate({opacity:0},1000);
+					            }
+				           });
+				           $('.next , .mark_right').bind(
+				                {'mouseenter':function(){
+						           $next.stop().animate({opacity:100},1000);
+				                },
+				                'mouseleave':function(){
+						           $next.stop().animate({opacity:0},1000);
+					            }
+				           });
+				           //遍历小图
+				           $asmallImg.each(function(){
+					          var $sm=$(this);
+					          $sm.click(function(){
+						      if(o.auto){
+							     clearInterval(tabShow);
+						      }
+					          if(now==$sm.index()){return;}
+					          now=$sm.index();
+					          tab(now,$abigImg.eq(now),$smallImg,$asmallImg,zIndex,o.speed,
+							  o.easing,total_imgs,$text,$num,arr[now]);
+					          zIndex++;
+					          });
+					          $sm.bind('mouseenter',function(){
+						         $(this).addClass('selected');
+					          });
+					          $sm.bind('mouseleave',function(){
+						         if($(this).index()!=now){
+							         $(this).removeClass('selected');
+						         }
+					          });
+				           });
 							
-				//prev
-				$prev.bind('click',function() {
-                     now--;
-					 if(now<0){
-					    if(o.circular){
-							  now=total_imgs-1;
-						}else{
-							  now++;
-							  return false;	  
-						 }
-					 }
-					tab(now,$abigImg.eq(now),$smallImg,$asmallImg,zIndex,o.speed,o.easing,total_imgs,$text,$num,arr[now]);
-					zIndex++;			
-                 });
-				//next
-				$next.click(function() {
-                    now++;
-					if(now>=total_imgs){
-						 if(o.circular){
-							   now=0;
-						  }else{
-							     now--;
-							     return false;	  
-					      }
-					}
-								tab(now,$abigImg.eq(now),$smallImg,$asmallImg,zIndex,o.speed,o.easing,total_imgs,$text,$num,arr[now]);
-								zIndex++;
-                            });
-							//设置定时器
-							if(o.auto!=0){
-								o.circular	= true;
-										slideshow	= setInterval(function(){
-											$next.trigger('click');
-										},o.auto);
-							}
+				           //prev
+				          $prev.bind('click',function() {
+                              now--;
+					          if(now<0){
+					              if(o.circular){
+							         now=total_imgs-1;
+						          }else{
+							         now++;
+							         return false;	  
+						          }
+					           }
+					          tab(now,$abigImg.eq(now),$smallImg,$asmallImg,zIndex,o.speed,
+							  o.easing,total_imgs,$text,$num,arr[now]);
+					          zIndex++;			
+                          });
+				          //next
+				          $next.click(function() {
+                              now++;
+					          if(now>=total_imgs){
+						         if(o.circular){
+							         now=0;
+						         }else{
+							         now--;
+							         return false;	  
+					             }
+					          }
+							 tab(now,$abigImg.eq(now),$smallImg,$asmallImg,zIndex,o.speed,
+							 o.easing,total_imgs,$text,$num,arr[now]);
+							 zIndex++;
+                          });
+						  $container.bind('mouseenter',function(){
+							  if(o.auto!=0){
+								  clearInterval(slideshow);
+							  }
+						  });
+						  $container.bind('mouseleave',function(){
+							  if(o.auto!=0){
+								  slideshow	= setInterval(function(){
+								     $next.trigger('click');
+							      },o.auto);
+							   }
+						  });
+						  //设置定时器
+						  if(o.auto!=0){
+							 o.circular	= true;
+							 slideshow	= setInterval(function(){
+								$next.trigger('click');
+							 },o.auto);
+						   }
 
-						
+						}
+					 });
 					 
 				 
 			 });
@@ -192,10 +214,10 @@ right:5px;z-index:3001;opacity:0;filter:alpha(opacity:0);cursor:pointer;}
 		  };
 		//默认配置
 		$.fn.flashTab.defaults={
-			auto     : 3000,
-			speed    : 2000,
-			circular : true,
-			easing   : 'jswing'
+			auto     : 0,      //自动播放的间隔时间，0则为不自动播放
+			speed    : 2000,   //运动速度
+			circular : true,   //是否要循环
+			easing   : 'jswing'//运动效果
 		}
 	 })(jQuery);
 </script>

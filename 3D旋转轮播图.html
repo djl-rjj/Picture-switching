@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style id="oCss">
+*{margin:0;padding:0;}
+/*在firefox中有bug*/
+#wrapper{ width:800px;height:360px;margin:50px auto;background:#fff;position:relative;}
+/*对舞台设置视距*/
+.picList{width:800px;height:360px;position:absolute;perspective:800px;}
+/*对容器加3D视图声明,不设置定位，层级无效*/
+.picList li{width:25px;height:360px;list-style:none;position:relative;transform-style:preserve-3d;float:left;transform: translateZ(-180px) rotateX(0deg);}
+.picList a {position:absolute;left:0;top:0; width:100%;height:100%;}
+.picList a:nth-of-type(1){background:url(img/3D_1.jpg);transform:translateZ(180px);}
+.picList a:nth-of-type(2){background:url(img/3D_2.jpg);transform-origin:top;transform:translateZ(-180px) rotateX(90deg) ;}
+.picList a:nth-of-type(3){background:url(img/3D_3.jpg);transform:translateZ(-180px) rotateX(180deg);}
+.picList a:nth-of-type(4){background:url(img/3D_4.jpg);;transform-origin:bottom;transform:translateZ(-180px) rotateX(-90deg);}
+.nav{position:absolute;bottom:-40px;width:170px;left:50%;margin-left:-85px;}
+.nav li{width:30px;height:30px;list-style:none;background:black;border-radius:50%;color:#fff;float:left;text-align:center;line-height:30px;margin-left:10px;cursor:pointer;}
+.nav li.selected{background:#f60;}
+.picList span{ width:360px;height:360px; position:absolute;top:0;}
+.picList span:nth-of-type(1){ left:0; transform-origin:left; transform:translateZ(180px) rotateY(90deg);}
+.picList span:nth-of-type(2){ right:0; transform-origin:right; transform:translateZ(180px) rotateY(90deg);}
+</style>
+<script src="js/prefixfree.min.js"></script>
+<script src="js/completegetClass.js"></script>
+<script>
+    window.onload=function(){
+		var oWrapper=document.getElementById('wrapper');
+		var oPicList=getClassOption('picList')[0];
+		var oNav=getClassOption('nav')[0];
+		var aNav=oNav.getElementsByTagName('li');
+		var aWidth=25;
+		var aLength=oWrapper.offsetWidth/aWidth;
+		var sHtml='';
+		var sStyle='';
+		var oCss=document.getElementById('oCss');
+		var iZindex=0;
+		var now=0;
+		for(var i=0;i<aLength;i++){
+			//会有视觉盲区，所以在中心点之前层级递增，中心点之后层级递减
+			i>aLength/2?iZindex--:iZindex++;
+			//设置样式
+			sStyle+='.picList li:nth-of-type('+(i+1)+'){z-index:'+iZindex+';}';
+			sStyle+='.picList li:nth-of-type('+(i+1)+') a{background-position:-'+i*aWidth+'px 0px;} ';
+			sHtml+='<li><a></a><a></a><a></a><a></a><span></span><span></span></li>';
+		}
+		oPicList.innerHTML=sHtml;
+		oCss.innerHTML+=sStyle;
+		var aLi=oPicList.getElementsByTagName('li');
+		for(var i=0;i<aNav.length;i++){
+			aNav[i].index=i;
+			aNav[i].onclick=function(){
+				
+				for(var i=0;i<aNav.length;i++){
+					aNav[i].className='';
+				}
+				this.className='selected';
+				for(var i=0;i<aLi.length;i++){
+					aLi[i].style.transform='translateZ(-180px) rotateX(-'+this.index*(90)+'deg)';
+					//每个Li的动画都比前一个要延迟50ms;持续时间按当前按钮和之前的索引差来算，
+					//差得多旋转的角度就更大，所需要的时间也应该多一点。比如之前是第1个按钮，则按第4个按钮的就需要1.5S
+					aLi[i].style.transition=0.5*Math.abs(now-this.index)+'s '+i*50+'ms all ease-in-out';
+				}
+				now=this.index;
+			};
+		}
+	};
+</script>
+</head>
+<body>
+<div id="wrapper">
+    <ul class="picList">
+        <!--一个li代表一个长方体，4个面是四张图片，还有两个面由span组成-->
+        <li>
+            <a href=""></a>
+            <a href=""></a>
+            <a href=""></a>
+            <a href=""></a>
+            <span></span>
+            <span></span>
+        </li>
+    </ul>
+    <ul class="nav">
+       <li class="selected">1</li>
+       <li>2</li>
+       <li>3</li>
+       <li>4</li>
+    </ul>
+</div>
+</body>
+</html>
