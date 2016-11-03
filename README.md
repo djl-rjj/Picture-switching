@@ -1,2 +1,2 @@
 # Picture-switching
-图片切换特效
+各种图片切换特效的研究和编写
