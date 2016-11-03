@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<style>
+*{margin:0; padding:0;}
+#wrapper{width:760px;height:300px;position:relative;margin:50px auto;perspective:800px;}
+#container{position:relative;transform-style:preserve-3d;transform:translateZ(-1000px) rotateY(0deg);}
+#container li{width:760px;height:280px;position:absolute;list-style:none;box-shadow:0 1px 5px #6C6C6C;}
+#container li:nth-of-type(1){transform: rotateY(0deg) translateZ(670px);}
+#container li:nth-of-type(2){transform:rotateY(60deg) translateZ(670px);}
+#container li:nth-of-type(3){transform: rotateY(120deg) translateZ(670px);}
+#container li:nth-of-type(4){transform: rotateY(180deg) translateZ(670px);}
+#container li:nth-of-type(5){transform: rotateY(240deg) translateZ(670px);}
+#container li:nth-of-type(6){transform: rotateY(300deg) translateZ(670px);}
+
+</style>
+<script>
+window.onload=function(){
+	var oContainer=document.getElementById('container');
+    var aLi=oContainer.getElementsByTagName('li');
+	var now=0;
+    for(var i=0;i<aLi.length;i++){
+		aLi[i].index=i;
+	   aLi[i].onclick=function(){
+	       oContainer.style.transform='translateZ(-1000px) rotateY(-'+60*(now++)+'deg)';
+		    oContainer.style.transition='transform 2s';
+	  };
+  }
+}
+</script>
+</head>
+
+<body>
+<div id="wrapper">
+    <ul id="container">
+       <li><img src="img/1.jpg" /></li>
+       <li><img src="img/2.jpg" /></li>
+       <li><img src="img/3.jpg" /></li>
+       <li><img src="img/4.jpg" /></li>
+       <li><img src="img/5.jpg" /></li>
+       <li><img src="img/6.jpg" /></li>
+    </ul>
+</div>
+</body>
+</html>
